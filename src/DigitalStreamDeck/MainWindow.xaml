@@ -43,6 +43,7 @@
             <TextBlock x:Name="EmptyState" Grid.Row="1" Text="Henüz tuş yok. + ile ilk tuşunu ekle." TextWrapping="Wrap" TextAlignment="Center"
                        Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
             <Grid Grid.Row="2" Margin="4,0">
+                <TextBlock Text="Sağ tık: düzenle" FontSize="10" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" />
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button x:Name="PreviousPageButton" Content="‹" Width="32" Padding="0" FontSize="20" Click="PreviousPage_Click" ToolTip="Önceki sayfa" AutomationProperties.Name="Önceki sayfa" />
                     <TextBlock x:Name="PageIndicator" Width="66" TextAlignment="Center" VerticalAlignment="Center" FontSize="12" AutomationProperties.LiveSetting="Polite" />

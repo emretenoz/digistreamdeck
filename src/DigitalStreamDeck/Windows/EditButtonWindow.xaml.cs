@@ -65,10 +65,7 @@ public partial class EditButtonWindow : Window
 
     private void Browse_Click(object sender, RoutedEventArgs e)
     {
-        var picker = new OpenFileDialog
-        {
-            Title = "Uygulama seç", Filter = "Uygulamalar ve kısayollar (*.exe;*.lnk)|*.exe;*.lnk", CheckFileExists = true, Multiselect = false
-        };
+        var picker = CreateApplicationPicker();
         if (picker.ShowDialog(this) == true)
         {
             ApplyBrowsedApplication(draft, picker.FileName);
@@ -77,6 +74,11 @@ public partial class EditButtonWindow : Window
             RefreshPreview();
         }
     }
+
+    internal static OpenFileDialog CreateApplicationPicker() => new()
+    {
+        Title = "Uygulama seç", Filter = "Uygulamalar ve kısayollar (*.exe;*.lnk)|*.exe;*.lnk", CheckFileExists = true, Multiselect = false, DereferenceLinks = false
+    };
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {

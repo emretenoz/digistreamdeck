@@ -36,6 +36,13 @@ public sealed class EditButtonWindowTests
     }
 
     [TestMethod]
+    public void ApplicationPicker_PreservesShortcutRatherThanDereferencingTarget()
+    {
+        var picker = EditButtonWindow.CreateApplicationPicker();
+        Assert.IsFalse(picker.DereferenceLinks, "The selected .lnk must remain the path returned by the picker.");
+    }
+
+    [TestMethod]
     public void ApplyBrowsedApplication_UpdatesDraftTargetTypeAndIconPath()
     {
         var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.lnk");
