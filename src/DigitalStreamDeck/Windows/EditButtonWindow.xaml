@@ -1,0 +1,71 @@
+<Window x:Class="DigitalStreamDeck.Windows.EditButtonWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Tuşu düzenle" Width="460" Height="570" ResizeMode="NoResize" Style="{StaticResource {x:Type Window}}"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Topmost="True">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <TextBlock Text="Tuşu düzenle" FontSize="23" FontWeight="SemiBold" />
+            <TextBlock Text="Bir uygulamaya veya web adresine hızlı erişim." Foreground="{StaticResource MutedBrush}" Margin="0,6,0,22" />
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="18" /><ColumnDefinition Width="100" /></Grid.ColumnDefinitions>
+                <StackPanel>
+                    <Label Content="_Başlık" Target="{Binding ElementName=TitleInput}" />
+                    <TextBox x:Name="TitleInput" MaxLength="24" AutomationProperties.Name="Başlık" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <Label Content="_Simge" Target="{Binding ElementName=IconInput}" />
+                    <TextBox x:Name="IconInput" AutomationProperties.Name="Simge" />
+                </StackPanel>
+            </Grid>
+            <Label Content="Renk" Margin="0,18,0,0" />
+            <ListBox x:Name="ColorInput" BorderThickness="0" Background="Transparent" SelectedValuePath="Tag"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Renk">
+                <ListBox.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="6" /></ItemsPanelTemplate></ListBox.ItemsPanel>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Margin" Value="0,0,7,0" />
+                        <Setter Property="Padding" Value="4" />
+                        <Setter Property="BorderThickness" Value="2" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusIndicator}" />
+                        <Setter Property="Template">
+                            <Setter.Value><ControlTemplate TargetType="ListBoxItem">
+                                <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter />
+                                </Border>
+                            </ControlTemplate></Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True"><Setter Property="BorderBrush" Value="{StaticResource TextBrush}" /></Trigger>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" /></Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBoxItem Tag="#2563EB" AutomationProperties.Name="Mavi"><Border Background="#2563EB" Height="30" CornerRadius="5" /></ListBoxItem>
+                <ListBoxItem Tag="#7C3AED" AutomationProperties.Name="Mor"><Border Background="#7C3AED" Height="30" CornerRadius="5" /></ListBoxItem>
+                <ListBoxItem Tag="#0891B2" AutomationProperties.Name="Turkuaz"><Border Background="#0891B2" Height="30" CornerRadius="5" /></ListBoxItem>
+                <ListBoxItem Tag="#EA580C" AutomationProperties.Name="Turuncu"><Border Background="#EA580C" Height="30" CornerRadius="5" /></ListBoxItem>
+                <ListBoxItem Tag="#059669" AutomationProperties.Name="Yeşil"><Border Background="#059669" Height="30" CornerRadius="5" /></ListBoxItem>
+                <ListBoxItem Tag="#DB2777" AutomationProperties.Name="Pembe"><Border Background="#DB2777" Height="30" CornerRadius="5" /></ListBoxItem>
+            </ListBox>
+            <Label Content="Eylem" Margin="0,18,0,6" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="ApplicationChoice" Content="_Uygulama" GroupName="Action" Checked="Action_Checked" Margin="0,0,24,0" />
+                <RadioButton x:Name="UrlChoice" Content="_Web adresi" GroupName="Action" Checked="Action_Checked" />
+            </StackPanel>
+            <Label Content="_Hedef" Target="{Binding ElementName=TargetInput}" Margin="0,20,0,0" />
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <TextBox x:Name="TargetInput" AutomationProperties.Name="Hedef" />
+                <Button x:Name="BrowseButton" Grid.Column="1" Content="Seç…" Margin="8,0,0,0" Padding="12,8" Click="Browse_Click" AutomationProperties.Name="Exe dosyası seç" />
+            </Grid>
+            <TextBlock x:Name="TargetHint" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,7,0,0" TextWrapping="Wrap" />
+            <TextBlock x:Name="ValidationMessage" Foreground="#FFBCB8" MinHeight="38" Margin="0,16,0,12" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="İptal" IsCancel="True" MinWidth="90" Margin="0,0,10,0" />
+                <Button Content="_Kaydet" IsDefault="True" MinWidth="100" Background="#2563EB" Click="Save_Click" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
