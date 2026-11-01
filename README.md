@@ -1,6 +1,6 @@
 # Digital Stream Deck
 
-Windows için altı özelleştirilebilir düğmeli bir hızlı erişim paneli.
+Windows için sayfalara ayrılmış, özelleştirilebilir bir hızlı erişim paneli. Her sayfada en fazla altı tuş gösterilir.
 
 ## Çalıştırma
 
@@ -20,11 +20,12 @@ dotnet publish src/DigitalStreamDeck/DigitalStreamDeck.csproj -c Release -r win-
 ## Kullanım
 
 - `Alt + Mouse Button 4` (genellikle farenin geri/yan düğmesi) paneli gösterir veya gizler.
-- Yapılandırılmış bir kutuya sol tıklamak web adresini veya uygulamayı açar. Boş bir kutuya sol tıklamak düzenleyiciyi açar; herhangi bir kutuya sağ tıklayarak da düzenleyebilirsiniz.
-- Düzenleyicide başlık, simge, renk ve HTTP/HTTPS adresi veya mevcut bir `.exe` dosyası seçin; **Kaydet** ile uygulayın veya **İptal** ile vazgeçin.
+- **+** ile tuş ekleyin. Altıdan fazla tuş olduğunda oklarla sayfalar arasında geçin; `N / M` geçerli ve toplam sayfa sayısını gösterir.
+- Yapılandırılmış bir tuşa sol tıklamak web adresini veya uygulamayı açar. Bir tuşa sağ tıklayarak düzenleyin veya düzenleyicide **Sil** seçeneğiyle onay vererek silin.
+- Düzenleyicide başlık, emoji, renk ve HTTP/HTTPS adresi veya mevcut bir `.exe` ya da `.lnk` dosyası seçin; **Kaydet** ile uygulayın veya **İptal** ile vazgeçin. Uygulama ve kısayollar için Windows simgesi otomatik kullanılır; simge alınamazsa seçtiğiniz emoji gösterilir.
 - Başlık alanından sürükleyerek paneli taşıyın. `Esc` paneli gizler; sağ üstteki **×** ayarları kaydedip uygulamadan çıkar.
 
-Düğmeler ve panel konumu `%LOCALAPPDATA%\DigitalStreamDeck\settings.json` dosyasında saklanır.
+Düğmeler ve panel konumu `%LOCALAPPDATA%\DigitalStreamDeck\settings.json` dosyasında saklanır. Önceki altı tuşlu ayarlar okunmaya devam eder; eklenen tuşlar aynı dosyada saklanır.
 
 ## Sınırlamalar
 

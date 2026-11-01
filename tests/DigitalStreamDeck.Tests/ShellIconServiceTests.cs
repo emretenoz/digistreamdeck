@@ -34,7 +34,9 @@ public sealed class ShellIconServiceTests
         Assert.IsNotNull(icon);
         Assert.AreSame(icon, service.GetIcon(path.ToUpperInvariant()));
         service.Clear(path);
-        Assert.AreNotSame(icon, service.GetIcon(path));
+        var refreshedIcon = service.GetIcon(path);
+        Assert.IsNotNull(refreshedIcon);
+        Assert.AreNotSame(icon, refreshedIcon);
     }
 
     [TestMethod]
