@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using DigitalStreamDeck.Models;
 using DigitalStreamDeck.Services;
@@ -7,6 +8,17 @@ namespace DigitalStreamDeck.Windows;
 
 public partial class EditButtonWindow : Window
 {
+    public static IReadOnlyDictionary<string, string> Palette { get; } = new ReadOnlyDictionary<string, string>(
+        new Dictionary<string, string>
+        {
+            ["Mavi"] = "#2563EB",
+            ["Mor"] = "#7C3AED",
+            ["Turkuaz"] = "#0891B2",
+            ["Turuncu"] = "#EA580C",
+            ["Yeşil"] = "#059669",
+            ["Pembe"] = "#DB2777"
+        });
+
     private readonly DeckButton draft;
     private readonly ActionLauncher validator;
 
@@ -46,9 +58,17 @@ public partial class EditButtonWindow : Window
 
     private void Save_Click(object sender, RoutedEventArgs e)
     {
+        var selectedColor = ColorInput.SelectedValue as string;
+        var colorError = ValidateColorSelection(selectedColor);
+        if (colorError is not null)
+        {
+            ValidationMessage.Text = colorError;
+            return;
+        }
+
         draft.Title = TitleInput.Text.Trim();
         draft.Icon = IconInput.Text.Trim();
-        draft.Color = (string)ColorInput.SelectedValue;
+        draft.Color = selectedColor!;
         draft.ActionType = UrlChoice.IsChecked == true ? DeckActionType.Url : DeckActionType.Application;
         draft.Target = TargetInput.Text.Trim();
         var error = validator.Validate(draft);
@@ -57,4 +77,7 @@ public partial class EditButtonWindow : Window
         SavedButton = draft.Clone();
         DialogResult = true;
     }
+
+    internal static string? ValidateColorSelection(string? selectedColor) =>
+        selectedColor is not null && Palette.Values.Contains(selectedColor) ? null : "Paletten bir renk seçin.";
 }
