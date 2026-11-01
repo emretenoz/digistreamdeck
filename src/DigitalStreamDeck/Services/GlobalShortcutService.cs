@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace DigitalStreamDeck.Services;
 
@@ -38,16 +39,41 @@ public sealed class GlobalShortcutService : IDisposable
 
     private nint HookCallback(int code, nint wParam, nint lParam)
     {
-        if (code >= 0)
+        try
         {
-            var mouse = Marshal.PtrToStructure<MouseHookData>(lParam);
-            var decision = filter.Process(unchecked((int)wParam), mouse.MouseData,
-                (GetAsyncKeyState(VkMenu) & 0x8000) != 0, Environment.TickCount64);
-            if (decision == ShortcutDecision.ToggleAndConsume) ToggleRequested?.Invoke(this, EventArgs.Empty);
-            if (decision != ShortcutDecision.PassThrough) return 1;
+            if (code >= 0)
+            {
+                var mouse = Marshal.PtrToStructure<MouseHookData>(lParam);
+                var decision = filter.Process(unchecked((int)wParam), mouse.MouseData,
+                    (GetAsyncKeyState(VkMenu) & 0x8000) != 0, Environment.TickCount64);
+                if (DispatchDecision(decision) != 0) return 1;
+            }
+
+            return CallNextHookEx(hook, code, wParam, lParam);
+        }
+        catch (Exception ex)
+        {
+            ReportFailure(ex);
+            try { return CallNextHookEx(hook, code, wParam, lParam); }
+            catch (Exception) { return 0; }
+        }
+    }
+
+    internal nint DispatchDecision(ShortcutDecision decision)
+    {
+        if (decision == ShortcutDecision.ToggleAndConsume)
+        {
+            try { ToggleRequested?.Invoke(this, EventArgs.Empty); }
+            catch (Exception ex) { ReportFailure(ex); }
         }
 
-        return CallNextHookEx(hook, code, wParam, lParam);
+        return decision == ShortcutDecision.PassThrough ? 0 : 1;
+    }
+
+    private static void ReportFailure(Exception exception)
+    {
+        try { Trace.TraceError("Global shortcut callback failed: {0}", exception); }
+        catch (Exception) { /* Diagnostics must not escape a native callback. */ }
     }
 
     [StructLayout(LayoutKind.Sequential)]
