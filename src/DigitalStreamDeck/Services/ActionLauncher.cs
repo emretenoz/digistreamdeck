@@ -22,8 +22,9 @@ public sealed class ActionLauncher(Func<ProcessStartInfo, Process?>? processStar
         return button.ActionType switch
         {
             DeckActionType.Application => File.Exists(button.Target)
-                && string.Equals(Path.GetExtension(button.Target), ".exe", StringComparison.OrdinalIgnoreCase)
-                    ? null : "Mevcut bir .exe dosyası seçin.",
+                && (string.Equals(Path.GetExtension(button.Target), ".exe", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(Path.GetExtension(button.Target), ".lnk", StringComparison.OrdinalIgnoreCase))
+                    ? null : "Mevcut bir .exe veya .lnk dosyası seçin.",
             DeckActionType.Url => Uri.TryCreate(button.Target, UriKind.Absolute, out var uri)
                 && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                     ? null : "Geçerli bir http veya https adresi girin.",

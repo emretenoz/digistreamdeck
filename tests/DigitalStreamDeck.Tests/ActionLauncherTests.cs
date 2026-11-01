@@ -17,35 +17,52 @@ public sealed class ActionLauncherTests
     }
 
     [TestMethod]
-    public void Validate_ExistingExecutable_AcceptsCaseInsensitiveExtension()
+    [DataRow("sample.exe")]
+    [DataRow("sample.EXE")]
+    [DataRow("sample.lnk")]
+    [DataRow("sample.LNK")]
+    public void Validate_ExistingApplication_AcceptsCaseInsensitiveExtension(string name)
     {
         var button = ValidButton();
         button.ActionType = DeckActionType.Application;
-        button.Target = ExistingFile("sample.EXE");
+        button.Target = ExistingFile(name);
         Assert.IsNull(new ActionLauncher().Validate(button));
     }
 
     [TestMethod]
     [DataRow("")]
     [DataRow("missing.exe")]
+    [DataRow("missing.lnk")]
     public void Validate_MissingApplication_ReturnsFriendlyError(string target)
     {
         var button = ValidButton();
         button.ActionType = DeckActionType.Application;
         button.Target = Path.Combine(directory, target);
-        Assert.AreEqual("Mevcut bir .exe dosyası seçin.", new ActionLauncher().Validate(button));
+        Assert.AreEqual("Mevcut bir .exe veya .lnk dosyası seçin.", new ActionLauncher().Validate(button));
     }
 
     [TestMethod]
-    public void Validate_ExistingNonExecutableOrDirectory_RejectsTarget()
+    [DataRow("sample.txt")]
+    [DataRow("sample.url")]
+    [DataRow("sample")]
+    public void Validate_ExistingUnsupportedFile_RejectsTarget(string name)
     {
         var button = ValidButton();
         button.ActionType = DeckActionType.Application;
-        button.Target = ExistingFile("sample.txt");
-        Assert.AreEqual("Mevcut bir .exe dosyası seçin.", new ActionLauncher().Validate(button));
-        button.Target = Path.Combine(directory, "folder.exe");
+        button.Target = ExistingFile(name);
+        Assert.AreEqual("Mevcut bir .exe veya .lnk dosyası seçin.", new ActionLauncher().Validate(button));
+    }
+
+    [TestMethod]
+    [DataRow("folder.exe")]
+    [DataRow("folder.lnk")]
+    public void Validate_Directory_RejectsTarget(string name)
+    {
+        var button = ValidButton();
+        button.ActionType = DeckActionType.Application;
+        button.Target = Path.Combine(directory, name);
         Directory.CreateDirectory(button.Target);
-        Assert.AreEqual("Mevcut bir .exe dosyası seçin.", new ActionLauncher().Validate(button));
+        Assert.AreEqual("Mevcut bir .exe veya .lnk dosyası seçin.", new ActionLauncher().Validate(button));
     }
 
     [TestMethod]
@@ -117,13 +134,15 @@ public sealed class ActionLauncherTests
     }
 
     [TestMethod]
-    [DataRow(DeckActionType.Application)]
-    [DataRow(DeckActionType.Url)]
-    public void Launch_ValidTarget_StartsExactTargetThroughShell(DeckActionType actionType)
+    [DataRow(DeckActionType.Application, "sample.exe")]
+    [DataRow(DeckActionType.Application, "sample.lnk")]
+    [DataRow(DeckActionType.Application, "sample.LNK")]
+    [DataRow(DeckActionType.Url, "")]
+    public void Launch_ValidTarget_StartsExactTargetThroughShell(DeckActionType actionType, string name)
     {
         var button = ValidButton();
         button.ActionType = actionType;
-        if (actionType == DeckActionType.Application) button.Target = ExistingFile("sample.exe");
+        if (actionType == DeckActionType.Application) button.Target = ExistingFile(name);
         ProcessStartInfo? captured = null;
         var launcher = new ActionLauncher(info => { captured = info; return null; });
 
