@@ -71,6 +71,7 @@ public partial class EditButtonWindow : Window
         };
         if (picker.ShowDialog(this) == true)
         {
+            ApplyBrowsedApplication(draft, picker.FileName);
             ApplicationChoice.IsChecked = true;
             TargetInput.Text = picker.FileName;
             RefreshPreview();
@@ -87,16 +88,12 @@ public partial class EditButtonWindow : Window
             return;
         }
 
-        draft.Title = TitleInput.Text.Trim();
-        draft.Icon = IconInput.Text.Trim();
-        draft.Color = selectedColor!;
-        draft.ActionType = UrlChoice.IsChecked == true ? DeckActionType.Url : DeckActionType.Application;
-        draft.Target = TargetInput.Text.Trim();
-        var error = validator.Validate(draft);
+        var candidate = CreateValidatedCandidate(draft, TitleInput.Text, IconInput.Text, selectedColor!,
+            UrlChoice.IsChecked == true ? DeckActionType.Url : DeckActionType.Application,
+            TargetInput.Text, validator, out var error);
         ValidationMessage.Text = error ?? "";
         if (error is not null) return;
-        draft.IconPath = ResolveIconPath(draft.ActionType, draft.Target);
-        SavedButton = draft.Clone();
+        SavedButton = candidate;
         DialogResult = true;
     }
 
@@ -126,6 +123,28 @@ public partial class EditButtonWindow : Window
         && (string.Equals(Path.GetExtension(target), ".exe", StringComparison.OrdinalIgnoreCase)
             || string.Equals(Path.GetExtension(target), ".lnk", StringComparison.OrdinalIgnoreCase))
             ? target : "";
+
+    internal static void ApplyBrowsedApplication(DeckButton draft, string target)
+    {
+        draft.ActionType = DeckActionType.Application;
+        draft.Target = target;
+        draft.IconPath = ResolveIconPath(draft.ActionType, target);
+    }
+
+    internal static DeckButton? CreateValidatedCandidate(DeckButton draft, string title, string icon, string color,
+        DeckActionType actionType, string target, ActionLauncher validator, out string? error)
+    {
+        var candidate = draft.Clone();
+        candidate.Title = title.Trim();
+        candidate.Icon = icon.Trim();
+        candidate.Color = color;
+        candidate.ActionType = actionType;
+        candidate.Target = target.Trim();
+        error = validator.Validate(candidate);
+        if (error is not null) return null;
+        candidate.IconPath = ResolveIconPath(actionType, candidate.Target);
+        return candidate;
+    }
 
     internal static string? ValidateColorSelection(string? selectedColor) =>
         selectedColor is not null && Palette.Values.Contains(selectedColor) ? null : "Paletten bir renk seçin.";

@@ -1,5 +1,6 @@
 using System.IO;
 using DigitalStreamDeck.Models;
+using DigitalStreamDeck.Services;
 using DigitalStreamDeck.Windows;
 
 namespace DigitalStreamDeck.Tests;
@@ -7,6 +8,49 @@ namespace DigitalStreamDeck.Tests;
 [TestClass]
 public sealed class EditButtonWindowTests
 {
+    [TestMethod]
+    public void CreateValidatedCandidate_FailedSave_PreservesOriginalDeleteTitle()
+    {
+        var draft = new DeckButton { Title = "Original", Icon = "😀", Target = "https://example.com", ActionType = DeckActionType.Url };
+
+        var candidate = EditButtonWindow.CreateValidatedCandidate(draft, "Unsaved", "😀", "#2563EB", DeckActionType.Url, "invalid", new ActionLauncher(), out var error);
+
+        Assert.IsNull(candidate);
+        Assert.IsNotNull(error);
+        Assert.AreEqual("Original", draft.Title);
+        Assert.AreEqual("https://example.com", draft.Target);
+    }
+
+    [TestMethod]
+    public void CreateValidatedCandidate_ValidSave_ReturnsEditedClone()
+    {
+        var draft = new DeckButton { Title = "Original", Icon = "😀", Target = "https://old.example", ActionType = DeckActionType.Url };
+
+        var candidate = EditButtonWindow.CreateValidatedCandidate(draft, " Updated ", "😀", "#2563EB", DeckActionType.Url, "https://example.com", new ActionLauncher(), out var error);
+
+        Assert.IsNull(error);
+        Assert.IsNotNull(candidate);
+        Assert.AreEqual("Updated", candidate.Title);
+        Assert.AreEqual("Original", draft.Title);
+        Assert.AreEqual("", candidate.IconPath);
+    }
+
+    [TestMethod]
+    public void ApplyBrowsedApplication_UpdatesDraftTargetTypeAndIconPath()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.lnk");
+        try
+        {
+            File.WriteAllText(path, "");
+            var draft = new DeckButton { ActionType = DeckActionType.Url, Target = "https://example.com" };
+            EditButtonWindow.ApplyBrowsedApplication(draft, path);
+            Assert.AreEqual(DeckActionType.Application, draft.ActionType);
+            Assert.AreEqual(path, draft.Target);
+            Assert.AreEqual(path, draft.IconPath);
+        }
+        finally { File.Delete(path); }
+    }
+
     [TestMethod]
     [DataRow(".exe")]
     [DataRow(".lnk")]
