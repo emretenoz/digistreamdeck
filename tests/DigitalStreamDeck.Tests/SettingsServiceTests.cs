@@ -82,6 +82,52 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
+    public async Task SaveAfterCorruptLoad_PreservesOriginalBytesOnceAndWritesValidDefaults()
+    {
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "settings.json");
+        byte[] original = [0xEF, 0xBB, 0xBF, 0x7B, 0xFF, 0x7D];
+        await File.WriteAllBytesAsync(path, original);
+        var service = new SettingsService(directory);
+        var loaded = await service.LoadAsync();
+
+        Assert.IsNotNull(loaded.Warning);
+        await service.SaveAsync(loaded.Settings);
+        await service.SaveAsync(loaded.Settings);
+
+        var backups = Directory.GetFiles(directory, "settings.json.corrupt-*");
+        Assert.HasCount(1, backups);
+        CollectionAssert.AreEqual(original, await File.ReadAllBytesAsync(backups[0]));
+        var reloaded = await service.LoadAsync();
+        Assert.IsNull(reloaded.Warning);
+        Assert.AreEqual("Tarayıcı", reloaded.Settings.Buttons[0].Title);
+        Assert.HasCount(6, reloaded.Settings.Buttons);
+    }
+
+    [TestMethod]
+    public async Task SaveAfterCorruptLoad_WhenOriginalCannotBeCopied_DoesNotReplaceIt()
+    {
+        Directory.CreateDirectory(directory);
+        var path = Path.Combine(directory, "settings.json");
+        byte[] original = [0x7B, 0xFF, 0x7D];
+        await File.WriteAllBytesAsync(path, original);
+        var service = new SettingsService(directory);
+        var loaded = await service.LoadAsync();
+
+        using (File.Open(path, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            try
+            {
+                await service.SaveAsync(loaded.Settings);
+                Assert.Fail("Save must fail when the original cannot be copied.");
+            }
+            catch (Exception exception) when (exception is IOException or UnauthorizedAccessException) { }
+        }
+
+        CollectionAssert.AreEqual(original, await File.ReadAllBytesAsync(path));
+    }
+
+    [TestMethod]
     public async Task LoadAsync_UnreadableFile_ReturnsDefaultsWithWarning()
     {
         Directory.CreateDirectory(Path.Combine(directory, "settings.json"));

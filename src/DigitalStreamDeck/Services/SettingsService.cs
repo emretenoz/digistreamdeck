@@ -10,6 +10,7 @@ public sealed class SettingsService
 {
     private readonly string directory;
     private readonly string settingsPath;
+    private bool preserveFailedLoad;
 
     public SettingsService(string? settingsDirectory = null)
     {
@@ -35,6 +36,7 @@ public sealed class SettingsService
         }
         catch (Exception exception) when (exception is JsonException or IOException or UnauthorizedAccessException)
         {
+            preserveFailedLoad = true;
             return Defaults("Ayarlar yüklenemedi; varsayılan düzen açıldı.");
         }
     }
@@ -52,6 +54,11 @@ public sealed class SettingsService
         }
 
         cancellationToken.ThrowIfCancellationRequested();
+        if (preserveFailedLoad)
+        {
+            File.Copy(settingsPath, settingsPath + ".corrupt-" + Guid.NewGuid().ToString("N"));
+            preserveFailedLoad = false;
+        }
         File.Move(temporaryPath, settingsPath, overwrite: true);
     }
 
