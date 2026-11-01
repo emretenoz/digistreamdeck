@@ -37,7 +37,7 @@ public sealed class SettingsServiceTests
         settings.Buttons[0] = new DeckButton
         {
             Id = "custom", Title = "Belgeler", Icon = "📁", Color = "#123456",
-            ActionType = DeckActionType.Application, Target = @"C:\Apps\example.exe"
+            ActionType = DeckActionType.Application, Target = @"C:\Apps\example.exe", IconPath = @"C:\Apps\example.exe"
         };
         settings.Buttons[1].ActionType = DeckActionType.Url;
         settings.Buttons[1].Target = "https://example.com";
@@ -59,6 +59,7 @@ public sealed class SettingsServiceTests
             Assert.AreEqual(expected.Color, actual.Color);
             Assert.AreEqual(expected.ActionType, actual.ActionType);
             Assert.AreEqual(expected.Target, actual.Target);
+            Assert.AreEqual(expected.IconPath, actual.IconPath);
         }
         Assert.IsFalse(File.Exists(Path.Combine(directory, "settings.json.tmp")));
     }
@@ -156,7 +157,7 @@ public sealed class SettingsServiceTests
     }
 
     [TestMethod]
-    public async Task LoadAsync_PartialButtons_NormalizesToSix()
+    public async Task LoadAsync_LegacyJsonWithoutIconPath_UsesEmptyFallback()
     {
         Directory.CreateDirectory(directory);
         await File.WriteAllTextAsync(Path.Combine(directory, "settings.json"),
@@ -165,10 +166,20 @@ public sealed class SettingsServiceTests
         var result = await new SettingsService(directory).LoadAsync();
 
         Assert.IsNull(result.Warning);
-        Assert.HasCount(6, result.Settings.Buttons);
+        Assert.HasCount(1, result.Settings.Buttons);
         Assert.AreEqual("custom", result.Settings.Buttons[0].Id);
         Assert.AreEqual("Özel", result.Settings.Buttons[0].Title);
         Assert.AreEqual(20d, result.Settings.WindowLeft);
-        Assert.AreEqual(6, result.Settings.Buttons.Select(button => button.Id).Distinct().Count());
+        Assert.AreEqual("", result.Settings.Buttons[0].IconPath);
+    }
+
+    [TestMethod]
+    public async Task SaveThenLoad_EmptyButtons_RemainsEmpty()
+    {
+        var service = new SettingsService(directory);
+        await service.SaveAsync(new DeckSettings());
+        var result = await service.LoadAsync();
+        Assert.IsNull(result.Warning);
+        Assert.HasCount(0, result.Settings.Buttons);
     }
 }

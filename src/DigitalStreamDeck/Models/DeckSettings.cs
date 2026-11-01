@@ -19,41 +19,39 @@ public sealed class DeckSettings
         ]
     };
 
+    public static DeckButton CreateNewButton() => new()
+    {
+        Id = Guid.NewGuid().ToString("N"), Title = "Yeni tuş", Icon = "+", Color = "#2563EB"
+    };
+
     public void Normalize()
     {
         var defaults = CreateDefault().Buttons;
         Buttons ??= [];
-        if (Buttons.Count > 6)
-        {
-            Buttons.RemoveRange(6, Buttons.Count - 6);
-        }
+        Buttons.RemoveAll(button => button is null);
 
-        var existingIds = Buttons.Where(button => button is not null && !string.IsNullOrWhiteSpace(button.Id))
+        var existingIds = Buttons.Where(button => !string.IsNullOrWhiteSpace(button.Id))
             .Select(button => button.Id).ToHashSet(StringComparer.Ordinal);
         var ids = new HashSet<string>(StringComparer.Ordinal);
-        for (var index = 0; index < 6; index++)
+        var genericFallback = CreateNewButton();
+        for (var index = 0; index < Buttons.Count; index++)
         {
-            var fallback = defaults[index];
-            var isNew = index == Buttons.Count || Buttons[index] is null;
-            if (index == Buttons.Count)
+            var fallback = index < defaults.Count ? defaults[index] : genericFallback;
+            var button = Buttons[index];
+            if (string.IsNullOrWhiteSpace(button.Id) || !ids.Add(button.Id))
             {
-                Buttons.Add(fallback.Clone());
-            }
-
-            var button = Buttons[index] ??= fallback.Clone();
-            if (string.IsNullOrWhiteSpace(button.Id) || (isNew && existingIds.Contains(button.Id)) || !ids.Add(button.Id))
-            {
-                button.Id = fallback.Id;
-                while (existingIds.Contains(button.Id) || !ids.Add(button.Id))
+                do
                 {
                     button.Id = Guid.NewGuid().ToString("N");
                 }
+                while (existingIds.Contains(button.Id) || !ids.Add(button.Id));
             }
 
             if (string.IsNullOrWhiteSpace(button.Title)) button.Title = fallback.Title;
             if (string.IsNullOrWhiteSpace(button.Icon)) button.Icon = fallback.Icon;
             if (string.IsNullOrWhiteSpace(button.Color)) button.Color = fallback.Color;
             button.Target ??= "";
+            button.IconPath ??= "";
         }
     }
 }
