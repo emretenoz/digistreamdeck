@@ -24,14 +24,32 @@
                                 Click="Tile_Click" PreviewMouseRightButtonUp="Tile_RightClick" PreviewKeyDown="Tile_PreviewKeyDown"
                                 ToolTip="Sol tık: aç · Sağ tık: düzenle" AutomationProperties.Name="{Binding Title}">
                             <StackPanel>
-                                <TextBlock Text="{Binding Icon}" FontFamily="Segoe UI Emoji" FontSize="30" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="100" />
+                                <Grid Height="36">
+                                    <Image x:Name="ShellIcon" Source="{Binding IconImage}" Width="32" Height="32" Stretch="Uniform" />
+                                    <TextBlock x:Name="EmojiIcon" Text="{Binding Icon}" FontFamily="Segoe UI Emoji" FontSize="30" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="100" Visibility="Collapsed" />
+                                </Grid>
                                 <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" Margin="0,9,0,0" TextTrimming="CharacterEllipsis" MaxWidth="100" HorizontalAlignment="Center" />
                             </StackPanel>
                         </Button>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IconImage}" Value="{x:Null}">
+                                <Setter TargetName="ShellIcon" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="EmojiIcon" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <TextBlock Grid.Row="2" Text="Sağ tık ile düzenle · Esc ile gizle" FontSize="11" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Bottom" />
+            <TextBlock x:Name="EmptyState" Grid.Row="1" Text="Henüz tuş yok. + ile ilk tuşunu ekle." TextWrapping="Wrap" TextAlignment="Center"
+                       Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+            <Grid Grid.Row="2" Margin="4,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="PreviousPageButton" Content="‹" Width="32" Padding="0" FontSize="20" Click="PreviousPage_Click" ToolTip="Önceki sayfa" AutomationProperties.Name="Önceki sayfa" />
+                    <TextBlock x:Name="PageIndicator" Width="66" TextAlignment="Center" VerticalAlignment="Center" FontSize="12" AutomationProperties.LiveSetting="Polite" />
+                    <Button x:Name="NextPageButton" Content="›" Width="32" Padding="0" FontSize="20" Click="NextPage_Click" ToolTip="Sonraki sayfa" AutomationProperties.Name="Sonraki sayfa" />
+                </StackPanel>
+                <Button x:Name="AddButton" Content="+" Width="32" Padding="0" FontSize="20" HorizontalAlignment="Right" Click="Add_Click" ToolTip="Tuş ekle" AutomationProperties.Name="Tuş ekle" />
+            </Grid>
         </Grid>
     </Border>
 </Window>

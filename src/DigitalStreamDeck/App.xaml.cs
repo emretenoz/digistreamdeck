@@ -12,7 +12,7 @@ public partial class App : Application
         base.OnStartup(e);
         var settingsService = new SettingsService();
         var loaded = await settingsService.LoadAsync();
-        var panel = new MainWindow(loaded.Settings, settingsService, new ActionLauncher());
+        var panel = new MainWindow(loaded.Settings, settingsService, new ActionLauncher(), new ShellIconService());
         MainWindow = panel;
         panel.Show();
 
