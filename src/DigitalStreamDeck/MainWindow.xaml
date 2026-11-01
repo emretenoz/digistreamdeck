@@ -1,0 +1,56 @@
+<Window x:Class="DigitalStreamDeck.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Digital Stream Deck" Width="450" Height="356" Style="{StaticResource {x:Type Window}}"
+        WindowStyle="None" ResizeMode="NoResize" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" WindowStartupLocation="Manual"
+        SourceInitialized="Window_SourceInitialized" PreviewKeyDown="Window_PreviewKeyDown" Closing="Window_Closing">
+    <Border Background="{StaticResource PanelBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" CornerRadius="20" Padding="18">
+        <Grid>
+            <Grid.RowDefinitions><RowDefinition Height="58" /><RowDefinition Height="*" /><RowDefinition Height="30" /></Grid.RowDefinitions>
+            <Grid Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <StackPanel>
+                    <TextBlock Text="STREAM DECK" FontSize="15" FontWeight="SemiBold" />
+                    <TextBlock Text="Alt + Mouse Button 4 · Göster / gizle" FontSize="11" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,0" />
+                </StackPanel>
+                <Button Content="×" Width="32" Height="32" Padding="0" FontSize="23" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Click="Close_Click" ToolTip="Uygulamadan çık" AutomationProperties.Name="Uygulamadan çık" />
+            </Grid>
+            <ItemsControl x:Name="Tiles" Grid.Row="1">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Rows="2" Columns="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Margin="4" Padding="8" Background="{Binding Color, FallbackValue=#2563EB}" BorderBrush="#50FFFFFF"
+                                Click="Tile_Click" PreviewMouseRightButtonUp="Tile_RightClick" PreviewKeyDown="Tile_PreviewKeyDown"
+                                ToolTip="Sol tık: aç · Sağ tık: düzenle" AutomationProperties.Name="{Binding Title}">
+                            <StackPanel>
+                                <Grid Height="36">
+                                    <Image x:Name="ShellIcon" Source="{Binding IconImage}" Width="32" Height="32" Stretch="Uniform" />
+                                    <TextBlock x:Name="EmojiIcon" Text="{Binding Icon}" FontFamily="Segoe UI Emoji" FontSize="30" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="100" Visibility="Collapsed" />
+                                </Grid>
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="13" Margin="0,9,0,0" TextTrimming="CharacterEllipsis" MaxWidth="100" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IconImage}" Value="{x:Null}">
+                                <Setter TargetName="ShellIcon" Property="Visibility" Value="Collapsed" />
+                                <Setter TargetName="EmojiIcon" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock x:Name="EmptyState" Grid.Row="1" Text="Henüz tuş yok. + ile ilk tuşunu ekle." TextWrapping="Wrap" TextAlignment="Center"
+                       Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" />
+            <Grid Grid.Row="2" Margin="4,0">
+                <TextBlock Text="Sağ tık: düzenle" FontSize="10" Foreground="{StaticResource MutedBrush}" HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="PreviousPageButton" Content="‹" Width="32" Padding="0" FontSize="20" Click="PreviousPage_Click" ToolTip="Önceki sayfa" AutomationProperties.Name="Önceki sayfa" />
+                    <TextBlock x:Name="PageIndicator" Width="66" TextAlignment="Center" VerticalAlignment="Center" FontSize="12" AutomationProperties.LiveSetting="Polite" />
+                    <Button x:Name="NextPageButton" Content="›" Width="32" Padding="0" FontSize="20" Click="NextPage_Click" ToolTip="Sonraki sayfa" AutomationProperties.Name="Sonraki sayfa" />
+                </StackPanel>
+                <Button x:Name="AddButton" Content="+" Width="32" Padding="0" FontSize="20" HorizontalAlignment="Right" Click="Add_Click" ToolTip="Tuş ekle" AutomationProperties.Name="Tuş ekle" />
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
