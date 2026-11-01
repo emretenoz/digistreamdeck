@@ -6,7 +6,7 @@
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Topmost="True">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="24">
-            <TextBlock Text="Tuşu düzenle" FontSize="23" FontWeight="SemiBold" />
+            <TextBlock x:Name="EditorHeading" Text="Tuşu düzenle" FontSize="23" FontWeight="SemiBold" />
             <TextBlock Text="Bir uygulamaya veya web adresine hızlı erişim." Foreground="{StaticResource MutedBrush}" Margin="0,6,0,22" />
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="18" /><ColumnDefinition Width="100" /></Grid.ColumnDefinitions>
@@ -16,9 +16,13 @@
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <Label Content="_Simge" Target="{Binding ElementName=IconInput}" />
-                    <TextBox x:Name="IconInput" AutomationProperties.Name="Simge" />
+                    <TextBox x:Name="IconInput" AutomationProperties.Name="Simge" TextChanged="PreviewInput_Changed" />
                 </StackPanel>
             </Grid>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <TextBlock Text="Önizleme:" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}" Margin="0,0,10,0" />
+                <Grid Width="32" Height="32"><Image x:Name="IconPreview" Stretch="Uniform" /><TextBlock x:Name="EmojiPreview" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" /></Grid>
+            </StackPanel>
             <Label Content="Renk" Margin="0,18,0,0" />
             <ListBox x:Name="ColorInput" BorderThickness="0" Background="Transparent" SelectedValuePath="Value"
                      ItemsSource="{x:Static local:EditButtonWindow.Palette}"
@@ -57,15 +61,18 @@
             <Label Content="_Hedef" Target="{Binding ElementName=TargetInput}" Margin="0,20,0,0" />
             <Grid>
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                <TextBox x:Name="TargetInput" AutomationProperties.Name="Hedef" />
-                <Button x:Name="BrowseButton" Grid.Column="1" Content="Seç…" Margin="8,0,0,0" Padding="12,8" Click="Browse_Click" AutomationProperties.Name="Exe dosyası seç" />
+                <TextBox x:Name="TargetInput" AutomationProperties.Name="Hedef" TextChanged="PreviewInput_Changed" />
+                <Button x:Name="BrowseButton" Grid.Column="1" Content="Seç…" Margin="8,0,0,0" Padding="12,8" Click="Browse_Click" AutomationProperties.Name="Uygulama veya kısayol seç" />
             </Grid>
             <TextBlock x:Name="TargetHint" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,7,0,0" TextWrapping="Wrap" />
             <TextBlock x:Name="ValidationMessage" Foreground="#FFBCB8" MinHeight="38" Margin="0,16,0,12" TextWrapping="Wrap" AutomationProperties.LiveSetting="Assertive" />
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="İptal" IsCancel="True" MinWidth="90" Margin="0,0,10,0" />
-                <Button Content="_Kaydet" IsDefault="True" MinWidth="100" Background="#2563EB" Click="Save_Click" />
-            </StackPanel>
+            <DockPanel>
+                <Button x:Name="DeleteButton" DockPanel.Dock="Left" Content="Tuşu sil" Foreground="#FFBCB8" Click="Delete_Click" />
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="İptal" IsCancel="True" MinWidth="90" Margin="0,0,10,0" />
+                    <Button Content="_Kaydet" IsDefault="True" MinWidth="100" Background="#2563EB" Click="Save_Click" />
+                </StackPanel>
+            </DockPanel>
         </StackPanel>
     </ScrollViewer>
 </Window>
