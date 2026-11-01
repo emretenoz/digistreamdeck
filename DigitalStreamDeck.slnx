@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DigitalStreamDeck/DigitalStreamDeck.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DigitalStreamDeck.Tests/DigitalStreamDeck.Tests.csproj" />
+  </Folder>
+</Solution>
